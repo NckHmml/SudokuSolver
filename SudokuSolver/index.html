@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>SudokuSolver</title>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body class="container">
+    <div class="row">
+        <div class="panel panel-default" data-template="field">
+            <div class="panel-heading">Sudoku Solver</div>
+        </div>
+    </div>
+
+    <!-- Templates -->
+    <script type="text/template" data-template-name="field">
+        <table class="table">
+            {{#blocks}}
+            <tr>
+                {{#.}}
+                <td>
+                    <div>{{x}}:{{y}}</div>
+                </td>
+                {{/.}}
+            </tr>
+            {{/blocks}}
+            {{^blocks}}
+            {{/blocks}}
+        </table>
+    </script>
+
+    <!-- Cordova reference, this is added to your app when it's built. -->
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="scripts/platformOverrides.js"></script>
+
+    <script type="text/javascript" src="scripts/jquery-2.1.3.min.js"></script>
+    <script type="text/javascript" src="scripts/mustache.min.js"></script>
+    <script type="text/javascript" src="scripts/index.min.js"></script>
+</body>
+</html>
