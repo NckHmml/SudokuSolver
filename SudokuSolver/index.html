@@ -12,7 +12,12 @@
 <body class="container">
     <div class="row">
         <div class="panel panel-default" data-template="field">
-            <div class="panel-heading">Sudoku Solver</div>
+            <div class="panel-heading clearfix">
+                <div class="btn-group pull-right">
+                    <a href="#" class="btn btn-default btn-sm">Solve</a>
+                </div>
+                <h1 class="panel-title pull-left">Sudoku Solver</h1>
+            </div>
         </div>
     </div>
 
@@ -23,7 +28,20 @@
             <tr>
                 {{#.}}
                 <td>
-                    <div>{{x}}:{{y}}</div>
+                    <div>
+                        <select data-x="{{x}}" data-y="{{y}}">
+                            <option></option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                        </select>
+                    </div>
                 </td>
                 {{/.}}
             </tr>
