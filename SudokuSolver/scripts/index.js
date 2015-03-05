@@ -202,16 +202,6 @@ $(function () {
 
             iSolved = 0;
 
-            // A very simple solving step, checking where only 1 value is possible based on the buffer
-            for (var x = 0; x < 9; x++)
-                for (var y = 0; y < 9; y++) {
-                    if (possibilities[x][y].length === 1) {
-                        iSolved++;
-                        blocks[x][y] = possibilities[x][y];
-                        possibilities[x][y] = [];
-                    }
-                }
-
             // Check if a value only has 1 available spot in a cell
             for (var val = 1; val <= 1; val++) {
                 for (var cell = 0; cell < 9; cell++) {
@@ -237,6 +227,16 @@ $(function () {
                     }
                 }
             }
+
+            // A very simple solving step, checking where only 1 value is possible based on the buffer
+            for (var x = 0; x < 9; x++)
+                for (var y = 0; y < 9; y++) {
+                    if (possibilities[x][y].length === 1) {
+                        iSolved++;
+                        blocks[x][y] = possibilities[x][y];
+                        possibilities[x][y] = [];
+                    }
+                }
 
             for (var x = 0; x < 9; x++)
                 for (var y = 0; y < 9; y++)
