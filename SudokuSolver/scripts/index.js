@@ -25,6 +25,8 @@
 })();
 
 $(function () {
+    $("#btnSolve").on("click", startSolve);
+
     $("[data-template]").each(function (index, element) {
         var _this = $(element),
             name = _this.attr("data-template"),
@@ -66,7 +68,6 @@ $(function () {
     }
 
     function selectChanged() {
-        console.clear();
         $("select:not([data-x='']):not([data-y=''])").removeClass("invalid");
 
         var _this = $(this),
@@ -95,7 +96,7 @@ $(function () {
     function checkCells(blocks) {
         for (var val = 1; val <= 9; val++) {
             var count = [];
-            
+
             for (var cell = 0; cell < 9; cell++) {
                 count.push(0);
 
@@ -151,5 +152,129 @@ $(function () {
                     $("select[data-x='" + x + "']").addClass("invalid");
             }
         }
+    }
+
+    function startSolve() {
+        var
+            step = 0,
+            iSolved = 0;
+        do {
+            var
+                possibilities = [],
+                blocks = [];
+
+            // Construct the block and possibilities buffer
+            for (var ix = 0; ix < 9; ix++) {
+                possibilities.push([]);
+                blocks.push([]);
+                for (var iy = 0; iy < 9; iy++) {
+                    possibilities[ix].push([]);
+                    for (var val = 1; val <= 9; val++)
+                        possibilities[ix][iy].push(val);
+                    blocks[ix].push(null);
+                }
+            }
+
+            // Fill the block buffer
+            $("select:not([data-x='']):not([data-y=''])").each(function () {
+                var x = $(this).attr("data-x"),
+                    y = $(this).attr("data-y");
+                blocks[x][y] = $(this).val();
+            });
+            // Iterate through all possible x,y and val
+            for (var x = 0; x < 9; x++)
+                for (var y = 0; y < 9; y++) {
+                    if (blocks[x][y] != '') {
+                        // Val already set, clear it
+                        possibilities[x][y] = [];
+                        continue;
+                    }
+                    for (var val = 1; val <= 9; val++) {
+                        // Checks if a value is possible, else remove it from the array
+                        if (!solveRow(blocks, x, y, val))
+                            arrayRemoveItem(possibilities[x][y], val);
+                        else if (!solveColumn(blocks, x, y, val))
+                            arrayRemoveItem(possibilities[x][y], val);
+                        else if (!solveCell(blocks, x, y, val))
+                            arrayRemoveItem(possibilities[x][y], val);
+                    }
+                }
+
+            iSolved = 0;
+
+            // A very simple solving step, checking where only 1 value is possible based on the buffer
+            for (var x = 0; x < 9; x++)
+                for (var y = 0; y < 9; y++) {
+                    if (possibilities[x][y].length === 1) {
+                        iSolved++;
+                        blocks[x][y] = possibilities[x][y];
+                        possibilities[x][y] = [];
+                    }
+                }
+
+            // Check if a value only has 1 available spot in a cell
+            for (var val = 1; val <= 1; val++) {
+                for (var cell = 0; cell < 9; cell++) {
+                    var spots = [];
+
+                    var startx = cell % 3;
+                    var starty = cell - (cell % 3);
+                    startx *= 3;
+                    for (var x = startx; x < startx + 3; x++)
+                        for (var y = starty; y < starty + 3; y++) {
+                            if (possibilities[x][y].indexOf(val) >= 0)
+                                spots.push({
+                                    x: x,
+                                    y: y
+                                });
+                        }
+
+                    if (spots.length === 1) {
+                        var spot = spots[0];
+                        iSolved++;
+                        blocks[spot.x][spot.y] = val;
+                        possibilities[spot.x][spot.y] = [];
+                    }
+                }
+            }
+
+            for (var x = 0; x < 9; x++)
+                for (var y = 0; y < 9; y++)
+                    $("select[data-x='" + x + "'][data-y='" + y + "']").val(blocks[x][y]);
+        }
+        while (iSolved > 0);
+    }
+
+    function solveRow(blocks, x, y, val) {
+        for (var ix = 0; ix < 9; ix++) {
+            if (x === ix) continue;
+            if (blocks[ix][y] == val) return false;
+        }
+        return true;
+    }
+
+    function solveColumn(blocks, x, y, val) {
+        for (var iy = 0; iy < 9; iy++) {
+            if (y === iy) continue;
+            if (blocks[x][iy] == val) return false;
+        }
+        return true;
+    }
+
+    function solveCell(blocks, x, y, val) {
+        var startx = x - (x % 3);
+        var starty = y - (y % 3);
+
+        for (var ix = startx; ix < startx + 3; ix++)
+            for (var iy = starty; iy < starty + 3; iy++) {
+                if (y === iy && x == ix) continue;
+                if (blocks[ix][iy] == val) return false;
+            }
+        return true;
+    }
+
+    function arrayRemoveItem(array, item) {
+        var index = array.indexOf(item);
+        array.splice(index, 1);
     }
 });
