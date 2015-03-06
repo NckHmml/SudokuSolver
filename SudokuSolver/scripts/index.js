@@ -155,7 +155,6 @@ $(function () {
     }
 
     function startSolve() {
-        console.clear();
         var
             step = 0,
             iSolved = 0;
@@ -164,135 +163,145 @@ $(function () {
                 possibilities = [],
                 blocks = [];
 
-            // Construct the block and possibilities buffer
-            for (var ix = 0; ix < 9; ix++) {
-                possibilities.push([]);
-                blocks.push([]);
-                for (var iy = 0; iy < 9; iy++) {
-                    possibilities[ix].push([]);
-                    for (var val = 1; val <= 9; val++)
-                        possibilities[ix][iy].push(val);
-                    blocks[ix].push(null);
-                }
-            }
-
-            // Fill the block buffer
-            $("select:not([data-x='']):not([data-y=''])").each(function () {
-                var x = $(this).attr("data-x"),
-                    y = $(this).attr("data-y");
-                blocks[x][y] = $(this).val();
-            });
-            // Iterate through all possible x,y and val
-            for (var x = 0; x < 9; x++)
-                for (var y = 0; y < 9; y++) {
-                    if (blocks[x][y] != '') {
-                        // Val already set, clear it
-                        possibilities[x][y] = [];
-                        continue;
-                    }
-                    for (var val = 1; val <= 9; val++) {
-                        // Checks if a value is possible, else remove it from the array
-                        if (!solveRow(blocks, x, y, val))
-                            arrayRemoveItem(possibilities[x][y], val);
-                        else if (!solveColumn(blocks, x, y, val))
-                            arrayRemoveItem(possibilities[x][y], val);
-                        else if (!solveCell(blocks, x, y, val))
-                            arrayRemoveItem(possibilities[x][y], val);
-                    }
-                }
-
             iSolved = 0;
 
-            // Checking rows of possible values, then use them to exclude possibilities
-            for (var val = 1; val <= 9; val++) {
-                for (var cell = 0; cell < 9; cell++) {
-                    var spots = [];
-
-                    var startx = cell % 3;
-                    var starty = cell - (cell % 3);
-                    startx *= 3;
-
-                    for (var x = startx; x < startx + 3; x++) {
-                        for (var y = starty; y < starty + 3; y++) {
-                            if (possibilities[x][y].indexOf(val) >= 0)
-                                spots.push({
-                                    x: x,
-                                    y: y
-                                });
-                        }
-                    }
-
-                    if (spots.length <= 1) continue;
-
-                    var spot = spots[0];
-                    var isRow = true,
-                        isCol = true;
-
-                    for (var i = 1; i < spots.length; i++) {
-                        isRow &= spots[i].y == spot.y;
-                        isCol &= spots[i].x == spot.x;
-                    }
-
-                    if (isRow && !isCol) {
-                        for (var x = 0; x < 9; x++) {
-                            if (x >= startx && x < startx + 3)
-                                continue;
-                            arrayRemoveItem(possibilities[x][spot.y], val);
-                        }
-                    } else if (isCol && !isRow) {
-                        for (var y = 0; y < 9; y++) {
-                            if (y >= starty && y < starty + 3)
-                                continue;
-                            arrayRemoveItem(possibilities[spot.x][y], val);
-                        }
-                    }
-                }
-            }
-
-            // Check if a value only has 1 available spot in a cell
-            for (var val = 1; val <= 9; val++) {
-                for (var cell = 0; cell < 9; cell++) {
-                    var spots = [];
-
-                    var startx = cell % 3;
-                    var starty = cell - (cell % 3);
-                    startx *= 3;
-                    for (var x = startx; x < startx + 3; x++) {
-                        for (var y = starty; y < starty + 3; y++) {
-                            if (possibilities[x][y].indexOf(val) >= 0)
-                                spots.push({
-                                    x: x,
-                                    y: y
-                                });
-                        }
-                    }
-
-                    if (spots.length === 1) {
-                        var spot = spots[0];
-                        iSolved++;
-                        blocks[spot.x][spot.y] = val;
-                        possibilities[spot.x][spot.y] = [];
-                    }
-                }
-            }
-
-            // A very simple solving step, checking where only 1 value is possible based on the buffer
-            for (var x = 0; x < 9; x++)
-                for (var y = 0; y < 9; y++) {
-                    if (possibilities[x][y].length === 1) {
-                        iSolved++;
-                        blocks[x][y] = possibilities[x][y];
-                        possibilities[x][y] = [];
-                    }
-                }
-
-            for (var x = 0; x < 9; x++)
-                for (var y = 0; y < 9; y++)
-                    $("select[data-x='" + x + "'][data-y='" + y + "']").val(blocks[x][y]);
-
-            console.log(++step + ":" + iSolved);
+            setPossibilities(blocks, possibilities);
+            iSolved += solveSpotMethod(blocks, possibilities);
+            setFields(blocks);
         }
         while (iSolved > 0);
+
+        var emptyCount = 0;
+        $("select:not([data-x='']):not([data-y=''])").each(function () {
+            if ($(this).val() === '')
+                emptyCount++;
+        });
+
+        if (emptyCount > 0) {
+            $('#modalForce').modal();
+        }
+    }
+
+    function setPossibilities(blocks, possibilities) {
+        // Construct the block and possibilities buffer
+        for (var ix = 0; ix < 9; ix++) {
+            possibilities.push([]);
+            blocks.push([]);
+            for (var iy = 0; iy < 9; iy++) {
+                possibilities[ix].push([]);
+                for (var val = 1; val <= 9; val++)
+                    possibilities[ix][iy].push(val);
+                blocks[ix].push(null);
+            }
+        }
+
+        // Fill the block buffer
+        $("select:not([data-x='']):not([data-y=''])").each(function () {
+            var x = $(this).attr("data-x"),
+                y = $(this).attr("data-y");
+            blocks[x][y] = $(this).val();
+        });
+        // Iterate through all possible x,y and val
+        for (var x = 0; x < 9; x++)
+            for (var y = 0; y < 9; y++) {
+                if (blocks[x][y] != '') {
+                    // Val already set, clear it
+                    possibilities[x][y] = [];
+                    continue;
+                }
+                for (var val = 1; val <= 9; val++) {
+                    // Checks if a value is possible, else remove it from the array
+                    if (!solveRow(blocks, x, y, val))
+                        arrayRemoveItem(possibilities[x][y], val);
+                    else if (!solveColumn(blocks, x, y, val))
+                        arrayRemoveItem(possibilities[x][y], val);
+                    else if (!solveCell(blocks, x, y, val))
+                        arrayRemoveItem(possibilities[x][y], val);
+                }
+            }
+    }
+
+    function setFields(blocks) {
+        for (var x = 0; x < 9; x++)
+            for (var y = 0; y < 9; y++)
+                $("select[data-x='" + x + "'][data-y='" + y + "']").val(blocks[x][y]);
+    }
+
+    function solveSpotMethod(blocks, possibilities) {
+        var iSolved = 0;
+        // Checking rows of possible values, then use them to exclude possibilities
+        for (var val = 1; val <= 9; val++) {
+            for (var cell = 0; cell < 9; cell++) {
+                var spots = [];
+
+                var startx = cell % 3;
+                var starty = cell - (cell % 3);
+                startx *= 3;
+
+                for (var x = startx; x < startx + 3; x++) {
+                    for (var y = starty; y < starty + 3; y++) {
+                        if (possibilities[x][y].indexOf(val) >= 0)
+                            spots.push({
+                                x: x,
+                                y: y
+                            });
+                    }
+                }
+
+                if (spots.length <= 1) continue;
+
+                var spot = spots[0];
+                var isRow = true,
+                    isCol = true;
+
+                for (var i = 1; i < spots.length; i++) {
+                    isRow &= spots[i].y == spot.y;
+                    isCol &= spots[i].x == spot.x;
+                }
+
+                if (isRow && !isCol) {
+                    for (var x = 0; x < 9; x++) {
+                        if (x >= startx && x < startx + 3)
+                            continue;
+                        arrayRemoveItem(possibilities[x][spot.y], val);
+                    }
+                } else if (isCol && !isRow) {
+                    for (var y = 0; y < 9; y++) {
+                        if (y >= starty && y < starty + 3)
+                            continue;
+                        arrayRemoveItem(possibilities[spot.x][y], val);
+                    }
+                }
+            }
+        }
+
+        // Check if a value only has 1 available spot in a cell
+        for (var val = 1; val <= 9; val++) {
+            for (var cell = 0; cell < 9; cell++) {
+                var spots = [];
+
+                var startx = cell % 3;
+                var starty = cell - (cell % 3);
+                startx *= 3;
+                for (var x = startx; x < startx + 3; x++) {
+                    for (var y = starty; y < starty + 3; y++) {
+                        if (possibilities[x][y].indexOf(val) >= 0)
+                            spots.push({
+                                x: x,
+                                y: y
+                            });
+                    }
+                }
+
+                if (spots.length === 1) {
+                    var spot = spots[0];
+                    iSolved++;
+                    blocks[spot.x][spot.y] = val;
+                    possibilities[spot.x][spot.y] = [];
+                }
+            }
+        }
+        return iSolved;
     }
 
     function solveRow(blocks, x, y, val) {

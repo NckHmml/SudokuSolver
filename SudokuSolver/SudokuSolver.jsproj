@@ -214,6 +214,10 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="index.html" />
+    <Content Include="scripts\bootstrap.js" />
+    <Content Include="scripts\bootstrap.min.js">
+      <DependentUpon>bootstrap.js</DependentUpon>
+    </Content>
     <Content Include="scripts\index.js" />
     <Content Include="scripts\index.min.js">
       <DependentUpon>index.js</DependentUpon>
