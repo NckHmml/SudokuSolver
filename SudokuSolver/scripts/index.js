@@ -27,6 +27,8 @@
 $(function () {
     $("#btnSolve").on("click", startSolve);
 
+    $("#btnForce").on("click", startForce);
+
     $("[data-template]").each(function (index, element) {
         var _this = $(element),
             name = _this.attr("data-template"),
@@ -336,5 +338,28 @@ $(function () {
         var index = array.indexOf(item);
         if (index < 0) return;
         array.splice(index, 1);
+    }
+
+    function startForce() {
+        var
+            possibilities = [],
+            blocks = [],
+            saveStart = [],
+            $break = false;
+        setPossibilities(blocks, possibilities);
+        saveStart = blocks;
+        for (var x = 0; x < 9; x++) {
+            for (var y = 0; y < 9; y++) {
+                if (possibilities[x][y].length > 0) {
+                    blocks[x][y] = possibilities[x][y][0];
+                    $break = true;
+                    break;
+                }
+            }
+            if ($break)
+                break;
+        }
+        setFields(blocks);
+        startSolve();
     }
 });
