@@ -162,41 +162,32 @@ $(function () {
 
     function startSolve() {
         var
+            possibilities = [],
+            blocks = [],
             step = 0,
             iSolved = 0;
+        markPreset();
+        setBlocks(blocks);
         do {
-            var
-                possibilities = [],
-                blocks = [];
+            possibilities = [];
+            setPossibilities(blocks, possibilities);
 
             iSolved = 0;
-
-            setPossibilities(blocks, possibilities);
             iSolved += solveSpotMethod(blocks, possibilities);
-            setFields(blocks);
         }
         while (iSolved > 0);
+        setFields(blocks);
 
-        var emptyCount = 0;
-        $("select:not([data-x='']):not([data-y=''])").each(function () {
-            if ($(this).val() === '')
-                emptyCount++;
-        });
-
-        if (emptyCount > 0) {
+        if (countEmptyBlocks(blocks) > 0) {
             $('#modalForce').modal();
         }
     }
 
-    function setPossibilities(blocks, possibilities) {
-        // Construct the block and possibilities buffer
+    function setBlocks(blocks) {
+        // Construct the block buffer
         for (var ix = 0; ix < 9; ix++) {
-            possibilities.push([]);
             blocks.push([]);
             for (var iy = 0; iy < 9; iy++) {
-                possibilities[ix].push([]);
-                for (var val = 1; val <= 9; val++)
-                    possibilities[ix][iy].push(val);
                 blocks[ix].push(null);
             }
         }
@@ -207,6 +198,19 @@ $(function () {
                 y = $(this).attr("data-y");
             blocks[x][y] = $(this).val();
         });
+    }
+
+    function setPossibilities(blocks, possibilities) {
+        // Construct the possibilities buffer
+        for (var ix = 0; ix < 9; ix++) {
+            possibilities.push([]);
+            for (var iy = 0; iy < 9; iy++) {
+                possibilities[ix].push([]);
+                for (var val = 1; val <= 9; val++)
+                    possibilities[ix][iy].push(val);
+            }
+        }
+
         // Iterate through all possible x,y and val
         for (var x = 0; x < 9; x++)
             for (var y = 0; y < 9; y++) {
@@ -349,27 +353,80 @@ $(function () {
             possibilities = [],
             blocks = [],
             saveStart = [],
-            $break = false;
-        setPossibilities(blocks, possibilities);
+            emptycount,
+            startWith = 0;
+        setBlocks(blocks);
+        emptycount = 999;
         saveStart = blocks;
-        for (var x = 0; x < 9; x++) {
-            for (var y = 0; y < 9; y++) {
-                if (possibilities[x][y].length > 0) {
-                    blocks[x][y] = possibilities[x][y][0];
-                    $break = true;
+        while (startWith < 9) {
+            while (emptycount > 0) {
+                if (emptycount == countEmptyBlocks(blocks))
                     break;
+                emptycount = countEmptyBlocks(blocks);
+                possibilities = []
+                setPossibilities(blocks, possibilities);
+                var $break = false;
+                for (var x = 0; x < 9; x++) {
+                    for (var y = 0; y < 9; y++) {
+                        if (possibilities[x][y].length > startWith) {
+                            blocks[x][y] = possibilities[x][y][startWith];
+                            startWith = 0
+                            $break = true;
+                            break;
+                        }
+                    }
+                    if ($break)
+                        break;
                 }
+
+                var iSolved;
+                do {
+                    possibilities = [];
+                    setPossibilities(blocks, possibilities);
+
+                    iSolved = 0;
+                    iSolved += solveSpotMethod(blocks, possibilities);
+                }
+                while (iSolved > 0);
             }
-            if ($break)
+
+            if (countEmptyBlocks(blocks) === 0)
                 break;
+            blocks = saveStart;
+            startWith++;
         }
-        setFields(blocks);
-        startSolve();
+
+        if (countEmptyBlocks(blocks) > 0) {
+            $('#modalFailed').modal();
+        } else {
+            setFields(blocks);
+        }
+    }
+
+    function countEmptyBlocks(blocks) {
+        var count = 0;
+        $.each(blocks, function (iRow) {
+            $.each(blocks[iRow], function (iCell) {
+                if (blocks[iRow][iCell] === '')
+                    count++;
+            });
+        });
+        return count;
+    }
+
+    function countPossibilities(possibilities) {
+        var count = 0;
+        $.each(possibilities, function (iRow) {
+            $.each(possibilities[iRow], function (iCell) {
+                count += possibilities[iRow][iCell].length;
+            });
+        });
+        return count;
     }
 
     function save() {
         var blocks = [];
-        setPossibilities(blocks, []);
+        setBlocks(blocks);
         $("#txtSave").val(JSON.stringify(blocks));
         $('#modalSave').modal();
     }
@@ -377,5 +434,16 @@ $(function () {
     function load() {
         var blocks = JSON.parse($("#txtLoad").val());
         setFields(blocks);
+        markPreset();
+    }
+
+    function markPreset() {
+        $("select:not([data-x='']):not([data-y=''])").each(function () {
+            if ($(this).val() !== '') {
+                $(this).addClass("original");
+            } else {
+                $(this).removeClass("original");
+            }
+        });
     }
 });

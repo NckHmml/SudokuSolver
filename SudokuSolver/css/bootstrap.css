@@ -6595,3 +6595,7 @@ button.close {
 .modal-body > .input-group {
   width: 100%;
 }
+.original {
+  border: 1px solid green;
+  color: green;
+}
