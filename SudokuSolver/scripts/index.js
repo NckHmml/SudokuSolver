@@ -29,6 +29,10 @@ $(function () {
 
     $("#btnForce").on("click", startForce);
 
+    $("#btnSave").on("click", save);
+
+    $("#btnLoad").on("click", load);
+
     $("[data-template]").each(function (index, element) {
         var _this = $(element),
             name = _this.attr("data-template"),
@@ -361,5 +365,17 @@ $(function () {
         }
         setFields(blocks);
         startSolve();
+    }
+
+    function save() {
+        var blocks = [];
+        setPossibilities(blocks, []);
+        $("#txtSave").val(JSON.stringify(blocks));
+        $('#modalSave').modal();
+    }
+
+    function load() {
+        var blocks = JSON.parse($("#txtLoad").val());
+        setFields(blocks);
     }
 });

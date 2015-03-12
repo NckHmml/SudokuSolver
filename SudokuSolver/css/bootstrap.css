@@ -6592,3 +6592,6 @@ button.close {
   left: 0;
   right: 0;
 }
+.modal-body > .input-group {
+  width: 100%;
+}

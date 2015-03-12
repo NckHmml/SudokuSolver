@@ -14,7 +14,14 @@
         <div class="panel panel-default" data-template="field">
             <div class="panel-heading clearfix">
                 <div class="btn-group pull-right">
-                    <button id="btnSolve" class="btn btn-default btn-sm">Solve</button>
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        Action <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a id="btnSolve" href="#">Solve</a></li>
+                        <li><a id="btnSave" href="#">Save</a></li>
+                        <li><a data-toggle="modal" data-target="#modalLoad" href="#">Load</a></li>
+                    </ul>
                 </div>
                 <h1 class="panel-title pull-left">Sudoku Solver</h1>
             </div>
@@ -65,6 +72,45 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" data-dismiss="modal" id="btnForce">Guess next step</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalSave" tabindex="-1" role="dialog" aria-labelledby="lblModalSave" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="lblModalSave">Save puzzle</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group">
+                        <textarea id="txtSave" rows="5" class="form-control"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalLoad" tabindex="-1" role="dialog" aria-labelledby="lblModalLoad" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="lblModalLoad">Load puzzle</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group">
+                        <textarea id="txtLoad" rows="5" class="form-control"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="btnLoad">Load</button>
                 </div>
             </div>
         </div>
