@@ -32,6 +32,7 @@ $(function () {
 
     $("#btnLoad").on("click", load);
 
+    // Mustache template renderer
     $("[data-template]").each(function (index, element) {
         var _this = $(element),
             name = _this.attr("data-template"),
@@ -41,9 +42,11 @@ $(function () {
 
         _this.append(output);
 
-        $("select:not([data-x='']):not([data-y=''])").on("change", selectChanged);
+        // Bind the on change event
+        $("input[type='number']:not([data-x='']):not([data-y=''])").on("change", selectChanged);
     });
 
+    // Get template data
     function getDataForTemplate(name) {
         switch (name) {
             case "field":
@@ -53,6 +56,7 @@ $(function () {
         }
     }
 
+    // Create empty block buffer for mustache templating
     function generateFieldData() {
         var data = {
             "blocks": []
@@ -72,30 +76,34 @@ $(function () {
         return data;
     }
 
+    // Input select change handler
     function selectChanged() {
-        $("select:not([data-x='']):not([data-y=''])").removeClass("invalid");
+        // Clear all invallid classes
+        $("input[type='number']:not([data-x='']):not([data-y=''])").removeClass("invalid");
 
+        // Create empty block buffer
         var _this = $(this),
             blocks = [];
-
         for (var ix = 0; ix < 9; ix++) {
             blocks.push([]);
             for (var iy = 0; iy < 9; iy++) {
                 blocks[ix].push(null);
             }
         }
-
-        $("select:not([data-x='']):not([data-y=''])").each(function () {
+        // Set block buffer
+        $("input[type='number']:not([data-x='']):not([data-y=''])").each(function () {
             var x = $(this).attr("data-x"),
                 y = $(this).attr("data-y");
             blocks[x][y] = $(this).val();
         });
 
+        // Checks
         checkCells(blocks);
         checkRows(blocks);
         checkColumns(blocks);
     }
 
+    // Check all cells and add the invalid class where needed
     function checkCells(blocks) {
         for (var val = 1; val <= 9; val++) {
             var count = [];
@@ -117,7 +125,7 @@ $(function () {
                 if (count[cell] > 1) {
                     for (var x = 0; x < 3; x++) {
                         for (var y = 0; y < 3; y++) {
-                            $("select[data-x='" + (x + startx) + "'][data-y='" + (y + starty) + "']").addClass("invalid");
+                            $("input[data-x='" + (x + startx) + "'][data-y='" + (y + starty) + "']").addClass("invalid");
                         }
                     }
                 }
@@ -125,6 +133,7 @@ $(function () {
         }
     }
 
+    // Check all rows and add the invalid class where needed
     function checkRows(blocks) {
         for (var val = 1; val <= 9; val++) {
             var count = [];
@@ -136,11 +145,12 @@ $(function () {
                         count[y]++;
                 }
                 if (count[y] > 1)
-                    $("select[data-y='" + y + "']").addClass("invalid");
+                    $("input[data-y='" + y + "']").addClass("invalid");
             }
         }
     }
 
+    // Check all columns and add the invalid class where needed
     function checkColumns(blocks) {
         for (var val = 1; val <= 9; val++) {
             var count = [];
@@ -152,11 +162,12 @@ $(function () {
                         count[x]++;
                 }
                 if (count[x] > 1)
-                    $("select[data-x='" + x + "']").addClass("invalid");
+                    $("input[data-x='" + x + "']").addClass("invalid");
             }
         }
     }
 
+    // Solving method
     function startSolve() {
         var
             possibilities = [],
@@ -165,6 +176,7 @@ $(function () {
             xSolved = 0;
         markPreset();
         setBlocks(blocks);
+        // Loop while it is able to solve
         do {
             iSolved = 0;
 
@@ -176,6 +188,7 @@ $(function () {
         while (iSolved > 0);
         setFields(blocks);
 
+        // If the simple methode failed, ask the user if he wants to continue with a bruteforce method
         if (countEmptyBlocks(blocks) > 0) {
             $('#modalForce').modal();
         }
@@ -191,7 +204,7 @@ $(function () {
         }
 
         // Fill the block buffer
-        $("select:not([data-x='']):not([data-y=''])").each(function () {
+        $("input[type='number']:not([data-x='']):not([data-y=''])").each(function () {
             var x = $(this).attr("data-x"),
                 y = $(this).attr("data-y");
             blocks[x][y] = $(this).val();
@@ -231,12 +244,14 @@ $(function () {
         }
     }
 
+    // Set the html inputs to the block data
     function setFields(blocks) {
         for (var x = 0; x < 9; x++)
             for (var y = 0; y < 9; y++)
-                $("select[data-x='" + x + "'][data-y='" + y + "']").val(blocks[x][y]);
+                $("input[data-x='" + x + "'][data-y='" + y + "']").val(blocks[x][y]);
     }
 
+    // Simple solve spot method, simply check for a spot with 1 unique possibility
     function solveSpotMethod(blocks, possibilities) {
         setPossibilities(blocks, possibilities);
         // Checking rows of possible values, then use them to exclude possibilities
@@ -315,6 +330,7 @@ $(function () {
         return 0;
     }
 
+    // More advanced xwing method
     function solveXwing(blocks, possibilities) {        
         setPossibilities(blocks, possibilities);
 
@@ -332,6 +348,7 @@ $(function () {
         return 0;
     }
 
+    // Row check
     function solveRow(blocks, x, y, val) {
         for (var ix = 0; ix < 9; ix++) {
             if (x === ix) continue;
@@ -340,6 +357,7 @@ $(function () {
         return true;
     }
 
+    // Column check
     function solveColumn(blocks, x, y, val) {
         for (var iy = 0; iy < 9; iy++) {
             if (y === iy) continue;
@@ -348,6 +366,7 @@ $(function () {
         return true;
     }
 
+    // Cell check
     function solveCell(blocks, x, y, val) {
         var startx = x - (x % 3);
         var starty = y - (y % 3);
@@ -361,12 +380,14 @@ $(function () {
         return true;
     }
 
+    // Removes a specific item from an array
     function arrayRemoveItem(array, item) {
         var index = array.indexOf(item);
         if (index < 0) return;
         array.splice(index, 1);
     }
 
+    // Start the bruteforcing method
     function startForce() {
         var blocks = [],
             possibilities = [];
@@ -374,12 +395,15 @@ $(function () {
         setPossibilities(blocks, possibilities);
 
         if (!forceStep(blocks)) {
+            // If no solution found, notify user
             $('#modalFailed').modal();
         } else {
+            // If solution found, set field data
             setFields(blocks);
         }
     }
 
+    // The bruteforce method
     function forceStep(blocks) {
         var emptycount = 999,
             possibilities = [],
@@ -387,6 +411,7 @@ $(function () {
             iSolved;
 
         while (emptycount > 0) {
+            // Break to prevent infinite loop when its imposible to guess
             if (emptycount == countEmptyBlocks(blocks))
                 break;
             emptycount = countEmptyBlocks(blocks);
@@ -405,6 +430,7 @@ $(function () {
                     break;
             }
 
+            // Apply the normal solving sequence per bruteforce step
             do {
                 iSolved = 0;
 
@@ -416,6 +442,7 @@ $(function () {
             while (iSolved > 0);
 
             if (countEmptyBlocks(blocks) === 0) {
+                // Return when solved
                 return true;
             }
             blocks = saveStart;
@@ -423,6 +450,7 @@ $(function () {
         return false;
     }
 
+    // Counts non-filled blocks
     function countEmptyBlocks(blocks) {
         var count = 0;
         $.each(blocks, function (iRow) {
@@ -434,6 +462,7 @@ $(function () {
         return count;
     }
 
+    // Counts the possibilities in the buffer
     function countPossibilities(possibilities) {
         var count = 0;
         $.each(possibilities, function (iRow) {
@@ -444,6 +473,7 @@ $(function () {
         return count;
     }
 
+    // Create a save string and show the popup
     function save() {
         var blocks = [];
         setBlocks(blocks);
@@ -451,15 +481,17 @@ $(function () {
         $('#modalSave').modal();
     }
 
+    // Load in data from the load popup
     function load() {
         var blocks = JSON.parse($("#txtLoad").val());
-        $("select:not([data-x='']):not([data-y=''])").removeClass("invalid");
+        $("input[type='number']:not([data-x='']):not([data-y=''])").removeClass("invalid");
         setFields(blocks);
         markPreset();
     }
 
+    // Mark preset data green, by adding a class
     function markPreset() {
-        $("select:not([data-x='']):not([data-y=''])").each(function () {
+        $("input[type='number']:not([data-x='']):not([data-y=''])").each(function () {
             if ($(this).val() !== '') {
                 $(this).addClass("original");
             } else {
@@ -468,6 +500,7 @@ $(function () {
         });
     }
 
+    // Xwing solving method
     function applyXwing(blocks, possibilities) {
         // Apply xwing rowbased
         for (var val = 1; val <= 9; val++) {

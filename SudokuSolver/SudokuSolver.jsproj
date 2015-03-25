@@ -111,6 +111,63 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="images\" />
+    <Content Include="bld\Debug\platforms\windows\build\phone\bld\PackageLayout\www\css\bootstrap.css">
+      <DependentUpon>bootstrap.less</DependentUpon>
+    </Content>
+    <Content Include="bld\Debug\platforms\windows\build\phone\bld\PackageLayout\www\css\index.css">
+      <DependentUpon>index.less</DependentUpon>
+    </Content>
+    <Content Include="bld\Debug\platforms\windows\www\css\bootstrap.css">
+      <DependentUpon>bootstrap.less</DependentUpon>
+    </Content>
+    <Content Include="bld\Debug\platforms\windows\www\css\index.css">
+      <DependentUpon>index.less</DependentUpon>
+    </Content>
+    <Content Include="bld\Debug\platforms\wp8\www\css\bootstrap.css">
+      <DependentUpon>bootstrap.less</DependentUpon>
+    </Content>
+    <Content Include="bld\Debug\platforms\wp8\www\css\bootstrap.min.css">
+      <DependentUpon>bootstrap.css</DependentUpon>
+    </Content>
+    <Content Include="bld\Debug\platforms\wp8\www\css\index.css">
+      <DependentUpon>index.less</DependentUpon>
+    </Content>
+    <Content Include="bld\Debug\www\css\bootstrap.css">
+      <DependentUpon>bootstrap.less</DependentUpon>
+    </Content>
+    <Content Include="bld\Debug\www\css\bootstrap.min.css">
+      <DependentUpon>bootstrap.css</DependentUpon>
+    </Content>
+    <Content Include="bld\Debug\www\css\index.css">
+      <DependentUpon>index.less</DependentUpon>
+    </Content>
+    <Content Include="bld\Ripple\Windows Phone %28Universal%29\Debug\css\bootstrap.css">
+      <DependentUpon>bootstrap.less</DependentUpon>
+    </Content>
+    <Content Include="bld\Ripple\Windows Phone %28Universal%29\Debug\css\bootstrap.min.css">
+      <DependentUpon>bootstrap.css</DependentUpon>
+    </Content>
+    <Content Include="bld\Ripple\Windows Phone %28Universal%29\Debug\css\index.css">
+      <DependentUpon>index.less</DependentUpon>
+    </Content>
+    <Content Include="bld\Ripple\Windows Phone 8\Debug\css\bootstrap.css">
+      <DependentUpon>bootstrap.less</DependentUpon>
+    </Content>
+    <Content Include="bld\Ripple\Windows Phone 8\Debug\css\index.css">
+      <DependentUpon>index.less</DependentUpon>
+    </Content>
+    <Content Include="bld\Ripple\Windows-x64\Debug\css\bootstrap.css">
+      <DependentUpon>bootstrap.less</DependentUpon>
+    </Content>
+    <Content Include="bld\Ripple\Windows-x64\Debug\css\index.css">
+      <DependentUpon>index.less</DependentUpon>
+    </Content>
+    <Content Include="bld\Windows-x64\Debug\www\css\bootstrap.css">
+      <DependentUpon>bootstrap.less</DependentUpon>
+    </Content>
+    <Content Include="bld\Windows-x64\Debug\www\css\index.css">
+      <DependentUpon>index.less</DependentUpon>
+    </Content>
     <Content Include="css\alerts.less" />
     <Content Include="css\badges.less" />
     <Content Include="css\bootstrap.css">
